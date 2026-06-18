@@ -98,7 +98,7 @@ export function DirectoryBrowser({ locale, dict }: { locale: Locale; dict: Dicti
                   const i = INDUSTRIES.find((x) => x.key === s)!;
                   return (
                     <span key={s} className="rounded-full bg-brand-50 px-2 py-0.5 text-xs text-brand-700">
-                      {i.icon} {label(i, locale)}
+                      {label(i, locale)}
                     </span>
                   );
                 })}

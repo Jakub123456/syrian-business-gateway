@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { Icon } from "@/components/icon";
 import { notFound } from "next/navigation";
 
 export default async function RoleChooserPage({
@@ -20,7 +21,7 @@ export default async function RoleChooserPage({
       bullets: [dict.role.exporterB1, dict.role.exporterB2, dict.role.exporterB3],
       cta: dict.home.registerExporter,
       href: `${base}/register/exporter`,
-      icon: "🏭",
+      icon: "factory",
       accent: "brand",
     },
     {
@@ -29,7 +30,7 @@ export default async function RoleChooserPage({
       bullets: [dict.role.importerB1, dict.role.importerB2, dict.role.importerB3],
       cta: dict.home.registerImporter,
       href: `${base}/register/importer`,
-      icon: "🌍",
+      icon: "globe",
       accent: "gold",
     },
   ] as const;
@@ -44,13 +45,15 @@ export default async function RoleChooserPage({
       <div className="mx-auto mt-10 grid max-w-4xl gap-6 md:grid-cols-2">
         {cards.map((c) => (
           <div key={c.href} className="flex flex-col rounded-2xl border border-line bg-surface p-8 shadow-sm">
-            <div className="text-4xl" aria-hidden>{c.icon}</div>
+            <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${c.accent === "gold" ? "bg-gold-400/15 text-gold-600" : "bg-brand-50 text-brand-600"}`}>
+              <Icon name={c.icon} className="h-6 w-6" />
+            </div>
             <h2 className="mt-4 text-xl font-semibold text-brand-800">{c.title}</h2>
             <p className="mt-2 text-sm text-muted">{c.desc}</p>
             <ul className="mt-5 space-y-2 text-sm">
               {c.bullets.map((b) => (
                 <li key={b} className="flex items-center gap-2">
-                  <span className={c.accent === "gold" ? "text-gold-500" : "text-brand-500"}>✓</span>
+                  <Icon name="check" className={`h-4 w-4 ${c.accent === "gold" ? "text-gold-500" : "text-brand-500"}`} />
                   {b}
                 </li>
               ))}

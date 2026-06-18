@@ -25,7 +25,7 @@ export default async function CountryDetailPage({
   const regionLabel = label(REGIONS.find((r) => r.key === country.region)!, loc);
   const industryLabel = (key: string) => {
     const i = INDUSTRIES.find((x) => x.key === key);
-    return i ? `${i.icon} ${label(i, loc)}` : key;
+    return i ? label(i, loc) : key;
   };
 
   return (

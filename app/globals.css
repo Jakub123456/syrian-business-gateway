@@ -1,26 +1,31 @@
 @import "tailwindcss";
 
-/* SBG design tokens. Brand palette: deep olive green + warm gold, evoking Syrian
-   olive groves and craft. Light theme only for a predictable B2B feel. */
+/* SBG design tokens — "muted sage": a subtle, green-ish system. Desaturated sage-green
+   as the single hue, one quiet clay accent used sparingly, low-contrast warm-neutral
+   surfaces. Light theme only for a calm, professional B2B feel. */
 @theme {
-  --color-brand-50: #f1f6ee;
-  --color-brand-100: #dcebd3;
-  --color-brand-200: #bcd8a9;
-  --color-brand-300: #95bf78;
-  --color-brand-400: #6fa04f;
-  --color-brand-500: #4f7d33;
-  --color-brand-600: #3c6427;
-  --color-brand-700: #2f4e20;
-  --color-brand-800: #283f1d;
-  --color-brand-900: #21341a;
-  --color-gold-400: #d9a441;
-  --color-gold-500: #c4882a;
-  --color-gold-600: #a66e1f;
-  --color-ink: #1b2417;
-  --color-muted: #5c6657;
+  --color-brand-50: #f2f5f1;
+  --color-brand-100: #e4ece2;
+  --color-brand-200: #cdddc9;
+  --color-brand-300: #a8bfa3;
+  --color-brand-400: #829d7c;
+  --color-brand-500: #5f7e5b;
+  --color-brand-600: #4a6b4f; /* primary actions */
+  --color-brand-700: #3a5740; /* hover */
+  --color-brand-800: #2e4533;
+  --color-brand-900: #233027;
+
+  /* Quiet clay accent — replaces the old gold. Kept under the gold-* keys so existing
+     components inherit it; use sparingly (small badges, secondary emphasis). */
+  --color-gold-400: #c4a37d;
+  --color-gold-500: #b0895c;
+  --color-gold-600: #93704a;
+
+  --color-ink: #1f2a22;
+  --color-muted: #647165;
   --color-surface: #ffffff;
-  --color-canvas: #f7f8f4;
-  --color-line: #e4e7df;
+  --color-canvas: #f4f6f2;
+  --color-line: #e4e8e3;
 
   --font-sans: var(--font-app-sans), system-ui, sans-serif;
 }

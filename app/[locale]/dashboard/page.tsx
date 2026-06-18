@@ -7,6 +7,7 @@ import { signOut } from "@/lib/auth/actions";
 import { db } from "@/lib/db";
 import { fromJsonList } from "@/lib/serialize";
 import { getCountry } from "@/lib/data/countries";
+import { Icon } from "@/components/icon";
 import { INDUSTRIES, EXPORT_STAGES, GOVERNORATES, label, type Locale as TaxLocale } from "@/lib/taxonomy";
 
 export default async function DashboardPage({
@@ -28,7 +29,7 @@ export default async function DashboardPage({
 
   const ind = (key: string) => {
     const i = INDUSTRIES.find((x) => x.key === key);
-    return i ? `${i.icon} ${label(i, loc)}` : key;
+    return i ? label(i, loc) : key;
   };
 
   return (
@@ -115,9 +116,11 @@ export default async function DashboardPage({
           {session.role === "EXPORTER" ? (
             <Link
               href={`/${locale}/dashboard/readiness`}
-              className="flex flex-col rounded-2xl border border-brand-200 bg-brand-50 p-6 text-center transition hover:border-brand-400 hover:shadow"
+              className="flex flex-col items-center rounded-2xl border border-brand-200 bg-brand-50 p-6 text-center transition hover:border-brand-400 hover:shadow"
             >
-              <p className="text-3xl">📊</p>
+              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-surface text-brand-600">
+                <Icon name="gauge" className="h-6 w-6" />
+              </span>
               <h3 className="mt-3 font-semibold text-brand-800">{dict.dashboard.readinessCard}</h3>
               <p className="mt-2 text-sm text-muted">{dict.dashboard.readinessCardBody}</p>
               <span className="mt-4 inline-block rounded-full bg-brand-600 px-4 py-1.5 text-sm font-semibold text-white">
@@ -125,8 +128,10 @@ export default async function DashboardPage({
               </span>
             </Link>
           ) : (
-            <div className="rounded-2xl border border-dashed border-line bg-surface p-6 text-center">
-              <p className="text-3xl">📥</p>
+            <div className="flex flex-col items-center rounded-2xl border border-dashed border-line bg-surface p-6 text-center">
+              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                <Icon name="inbox" className="h-6 w-6" />
+              </span>
               <h3 className="mt-3 font-semibold text-brand-800">{dict.role.importerB1}</h3>
               <p className="mt-2 text-sm text-muted">{dict.dashboard.body}</p>
               <span className="mt-4 inline-block rounded-full bg-gold-400/15 px-3 py-1 text-sm font-medium text-gold-600">

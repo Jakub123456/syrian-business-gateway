@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { Icon, type IconName } from "@/components/icon";
 import { notFound } from "next/navigation";
 
 export default async function HomePage({
@@ -13,10 +14,10 @@ export default async function HomePage({
   const dict = await getDictionary(locale as Locale);
   const base = `/${locale}`;
 
-  const features = [
-    { title: dict.home.feature1Title, body: dict.home.feature1Body, icon: "🤝" },
-    { title: dict.home.feature2Title, body: dict.home.feature2Body, icon: "📊" },
-    { title: dict.home.feature3Title, body: dict.home.feature3Body, icon: "🧭" },
+  const features: { title: string; body: string; icon: IconName }[] = [
+    { title: dict.home.feature1Title, body: dict.home.feature1Body, icon: "link" },
+    { title: dict.home.feature2Title, body: dict.home.feature2Body, icon: "gauge" },
+    { title: dict.home.feature3Title, body: dict.home.feature3Body, icon: "compass" },
   ];
 
   return (
@@ -70,8 +71,8 @@ export default async function HomePage({
               key={f.title}
               className="rounded-xl border border-line bg-surface p-6 shadow-sm"
             >
-              <div className="mb-3 text-3xl" aria-hidden>
-                {f.icon}
+              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                <Icon name={f.icon} className="h-6 w-6" />
               </div>
               <h3 className="text-lg font-semibold text-brand-800">{f.title}</h3>
               <p className="mt-2 text-sm text-muted">{f.body}</p>

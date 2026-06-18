@@ -6,6 +6,7 @@ import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { COUNTRIES } from "@/lib/data/countries";
 import { REGIONS, TRADE_BLOCS, INDUSTRIES, label, type Region, type TradeBloc } from "@/lib/taxonomy";
+import { Icon, REGION_ICON } from "@/components/icon";
 
 const industryLabel = (key: string, locale: Locale) => {
   const i = INDUSTRIES.find((x) => x.key === key);
@@ -59,7 +60,9 @@ export function ExplorerBrowser({ locale, dict }: { locale: Locale; dict: Dictio
                   onClick={() => setRegion(r.key)}
                   className="flex items-center gap-4 rounded-xl border border-line bg-surface p-5 text-start shadow-sm transition hover:border-brand-300 hover:shadow disabled:opacity-40 disabled:hover:border-line"
                 >
-                  <span className="text-3xl" aria-hidden>{r.icon}</span>
+                  <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                    <Icon name={REGION_ICON[r.key]} className="h-6 w-6" />
+                  </span>
                   <span>
                     <span className="block font-semibold text-brand-800">{label(r, locale)}</span>
                     <span className="block text-sm text-muted">{count} {e.countries}</span>

@@ -5,6 +5,7 @@ import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { computeReadiness, type ReadinessResponse } from "@/lib/readiness/actions";
 import type { ReadinessResult } from "@/lib/readiness/rubric";
+import { Icon } from "@/components/icon";
 
 export type Market = { iso2: string; name: string; flag: string };
 
@@ -114,8 +115,15 @@ export function ReadinessPanel({
           <div className="rounded-2xl border border-line bg-surface p-6 lg:col-span-3">
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-semibold uppercase tracking-wide text-muted">{r.assessment}</h3>
-              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${data.narrative.source === "ai" ? "bg-brand-100 text-brand-700" : "bg-canvas text-muted"}`}>
-                {data.narrative.source === "ai" ? `✨ ${r.poweredByAI}` : r.ruleBased}
+              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${data.narrative.source === "ai" ? "bg-brand-100 text-brand-700" : "bg-canvas text-muted"}`}>
+                {data.narrative.source === "ai" ? (
+                  <>
+                    <Icon name="sparkles" className="h-3.5 w-3.5" />
+                    {r.poweredByAI}
+                  </>
+                ) : (
+                  r.ruleBased
+                )}
               </span>
             </div>
             <p className="mt-3 text-sm text-ink">{data.narrative.text}</p>

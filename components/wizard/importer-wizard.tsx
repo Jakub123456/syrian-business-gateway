@@ -9,6 +9,7 @@ import { COUNTRIES } from "@/lib/data/countries";
 import { registerImporter } from "@/lib/auth/actions";
 import { Stepper } from "./stepper";
 import { Field, TextInput, TextArea, Select, ChipToggle } from "./fields";
+import { Icon } from "@/components/icon";
 
 const STORAGE_KEY = "sbg:importer-draft";
 
@@ -95,7 +96,9 @@ export function ImporterWizard({ locale, dict }: { locale: Locale; dict: Diction
   if (done) {
     return (
       <div className="rounded-2xl border border-gold-400/40 bg-gold-400/10 p-10 text-center">
-        <div className="text-4xl">✅</div>
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gold-400/20 text-gold-600">
+          <Icon name="check" className="h-7 w-7" />
+        </div>
         <h2 className="mt-4 text-xl font-semibold text-brand-800">{w.doneTitle}</h2>
         <p className="mt-2 text-muted">{w.doneBody}</p>
         <button
@@ -137,7 +140,7 @@ export function ImporterWizard({ locale, dict }: { locale: Locale; dict: Diction
             <div className="flex flex-wrap gap-2">
               {INDUSTRIES.map((i) => (
                 <ChipToggle key={i.key} active={draft.industries.includes(i.key)} onClick={() => set({ industries: toggle(draft.industries, i.key) })}>
-                  {i.icon} {label(i, locale)}
+                  {label(i, locale)}
                 </ChipToggle>
               ))}
             </div>
@@ -160,7 +163,7 @@ export function ImporterWizard({ locale, dict }: { locale: Locale; dict: Diction
             <div className="flex flex-wrap gap-2">
               {INDUSTRIES.map((i) => (
                 <ChipToggle key={i.key} active={draft.categoriesOfInterest.includes(i.key)} onClick={() => set({ categoriesOfInterest: toggle(draft.categoriesOfInterest, i.key) })}>
-                  {i.icon} {label(i, locale)}
+                  {label(i, locale)}
                 </ChipToggle>
               ))}
             </div>

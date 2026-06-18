@@ -26,7 +26,7 @@ export default async function ExporterProfilePage({
   const stageLabel = label(EXPORT_STAGES.find((s) => s.key === ex.exportStage)!, loc);
   const industry = (key: string) => {
     const i = INDUSTRIES.find((x) => x.key === key);
-    return i ? `${i.icon} ${label(i, loc)}` : key;
+    return i ? label(i, loc) : key;
   };
 
   return (

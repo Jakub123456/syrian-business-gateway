@@ -18,6 +18,7 @@ import { COUNTRIES } from "@/lib/data/countries";
 import { registerExporter } from "@/lib/auth/actions";
 import { Stepper } from "./stepper";
 import { Field, TextInput, TextArea, Select, ChipToggle } from "./fields";
+import { Icon } from "@/components/icon";
 
 const STORAGE_KEY = "sbg:exporter-draft";
 
@@ -117,7 +118,9 @@ export function ExporterWizard({ locale, dict }: { locale: Locale; dict: Diction
   if (done) {
     return (
       <div className="rounded-2xl border border-brand-200 bg-brand-50 p-10 text-center">
-        <div className="text-4xl">✅</div>
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 text-brand-600">
+          <Icon name="check" className="h-7 w-7" />
+        </div>
         <h2 className="mt-4 text-xl font-semibold text-brand-800">{w.doneTitle}</h2>
         <p className="mt-2 text-muted">{w.doneBody}</p>
         <button
@@ -184,7 +187,7 @@ export function ExporterWizard({ locale, dict }: { locale: Locale; dict: Diction
             <div className="flex flex-wrap gap-2">
               {INDUSTRIES.map((i) => (
                 <ChipToggle key={i.key} active={draft.sectors.includes(i.key)} onClick={() => set({ sectors: toggle(draft.sectors, i.key) })}>
-                  {i.icon} {label(i, locale)}
+                  {label(i, locale)}
                 </ChipToggle>
               ))}
             </div>
