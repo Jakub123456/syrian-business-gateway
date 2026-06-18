@@ -1,0 +1,88 @@
+// Active dev schema — SQLite (zero-infra local DB). Production target is Postgres
+// (see plan.md §4): switching means `provider = "postgresql"`, turning the JSON-string
+// list fields back into native arrays, and the string status/role fields into enums.
+//
+// SQLite has no enums or scalar lists, so:
+//   - enum-typed columns (role, type, exportStage, verification, category) are validated
+//     strings, checked in app code against lib/taxonomy.ts.
+//   - list columns (sectors, targetMarkets, …) are JSON-encoded strings; (de)serialized
+//     by the helpers in lib/serialize.ts.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  role          String // EXPORTER | IMPORTER | ADMIN
+  locale        String    @default("en")
+  emailVerified DateTime?
+  company       Company?
+  createdAt     DateTime  @default(now())
+}
+
+model Company {
+  id            String           @id @default(cuid())
+  owner         User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId       String           @unique
+  type          String // EXPORTER | IMPORTER
+  nameEn        String
+  nameAr        String?
+  email         String
+  phone         String?
+  website       String?
+  logoUrl       String?
+  descriptionEn String?
+  descriptionAr String?
+  countryIso2   String
+  verification  String           @default("UNVERIFIED")
+  isDraft       Boolean          @default(false)
+  exporter      ExporterProfile?
+  importer      ImporterProfile?
+  products      Product[]
+  createdAt     DateTime         @default(now())
+
+  @@index([type, verification])
+}
+
+model ExporterProfile {
+  companyId        String  @id
+  company          Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  governorate      String
+  sectors          String  @default("[]") // JSON string[]
+  exportStage      String
+  certifications   String  @default("[]") // JSON string[]
+  yearEstablished  Int?
+  employeeBucket   String?
+  capacityNote     String?
+  hasExportLicense Boolean @default(false)
+  currentMarkets   String  @default("[]") // JSON string[] (iso2)
+  targetMarkets    String  @default("[]") // JSON string[] (iso2)
+}
+
+model ImporterProfile {
+  companyId            String  @id
+  company              Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  industries           String  @default("[]") // JSON string[]
+  categoriesOfInterest String  @default("[]") // JSON string[]
+  orderVolume          String?
+}
+
+model Product {
+  id          String  @id @default(cuid())
+  company     Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId   String
+  nameEn      String
+  nameAr      String?
+  category    String
+  description String?
+
+  @@index([companyId])
+}

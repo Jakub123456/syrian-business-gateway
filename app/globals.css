@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+/* SBG design tokens. Brand palette: deep olive green + warm gold, evoking Syrian
+   olive groves and craft. Light theme only for a predictable B2B feel. */
+@theme {
+  --color-brand-50: #f1f6ee;
+  --color-brand-100: #dcebd3;
+  --color-brand-200: #bcd8a9;
+  --color-brand-300: #95bf78;
+  --color-brand-400: #6fa04f;
+  --color-brand-500: #4f7d33;
+  --color-brand-600: #3c6427;
+  --color-brand-700: #2f4e20;
+  --color-brand-800: #283f1d;
+  --color-brand-900: #21341a;
+  --color-gold-400: #d9a441;
+  --color-gold-500: #c4882a;
+  --color-gold-600: #a66e1f;
+  --color-ink: #1b2417;
+  --color-muted: #5c6657;
+  --color-surface: #ffffff;
+  --color-canvas: #f7f8f4;
+  --color-line: #e4e7df;
+
+  --font-sans: var(--font-app-sans), system-ui, sans-serif;
+}
+
+html {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+/* RTL: flip directional glyphs that aren't covered by logical CSS properties. */
+[dir="rtl"] .flip-rtl {
+  transform: scaleX(-1);
+}
+
+@layer utilities {
+  .container-page {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+}
