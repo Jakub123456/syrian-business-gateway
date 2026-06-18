@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -110,17 +111,29 @@ export default async function DashboardPage({
             )}
           </div>
 
-          {/* Phase 4 placeholder */}
-          <div className="rounded-2xl border border-dashed border-line bg-surface p-6 text-center">
-            <p className="text-3xl">{session.role === "EXPORTER" ? "📊" : "📥"}</p>
-            <h3 className="mt-3 font-semibold text-brand-800">
-              {session.role === "EXPORTER" ? dict.home.feature2Title : dict.role.importerB1}
-            </h3>
-            <p className="mt-2 text-sm text-muted">{dict.dashboard.body}</p>
-            <span className="mt-4 inline-block rounded-full bg-gold-400/15 px-3 py-1 text-sm font-medium text-gold-600">
-              {dict.common.comingSoon}
-            </span>
-          </div>
+          {/* Export readiness (Phase 4) for exporters; placeholder for importers */}
+          {session.role === "EXPORTER" ? (
+            <Link
+              href={`/${locale}/dashboard/readiness`}
+              className="flex flex-col rounded-2xl border border-brand-200 bg-brand-50 p-6 text-center transition hover:border-brand-400 hover:shadow"
+            >
+              <p className="text-3xl">📊</p>
+              <h3 className="mt-3 font-semibold text-brand-800">{dict.dashboard.readinessCard}</h3>
+              <p className="mt-2 text-sm text-muted">{dict.dashboard.readinessCardBody}</p>
+              <span className="mt-4 inline-block rounded-full bg-brand-600 px-4 py-1.5 text-sm font-semibold text-white">
+                {dict.dashboard.openReadiness}
+              </span>
+            </Link>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-line bg-surface p-6 text-center">
+              <p className="text-3xl">📥</p>
+              <h3 className="mt-3 font-semibold text-brand-800">{dict.role.importerB1}</h3>
+              <p className="mt-2 text-sm text-muted">{dict.dashboard.body}</p>
+              <span className="mt-4 inline-block rounded-full bg-gold-400/15 px-3 py-1 text-sm font-medium text-gold-600">
+                {dict.common.comingSoon}
+              </span>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -138,6 +138,28 @@
     "body": "Your matches, readiness score and development plan will appear here.",
     "signOut": "Sign out",
     "signedInAs": "Signed in as",
-    "pendingReview": "Pending review"
+    "pendingReview": "Pending review",
+    "readinessCard": "Export readiness",
+    "readinessCardBody": "Score your company against a target market and get a plan to close the gap.",
+    "openReadiness": "Open readiness check"
+  },
+  "readiness": {
+    "title": "Export Readiness",
+    "subtitle": "Score your company against a target market's certifications, standards and documentation — then act on the gaps.",
+    "selectMarket": "Target market",
+    "run": "Run readiness check",
+    "running": "Scoring…",
+    "scoreOutOf": "/ 100",
+    "bandLow": "Significant gaps",
+    "bandMedium": "Partially ready",
+    "bandHigh": "Export ready",
+    "breakdown": "Score breakdown",
+    "gaps": "Priority actions to close the gap",
+    "assessment": "Assessment",
+    "poweredByAI": "AI-assisted",
+    "ruleBased": "Rule-based",
+    "noTargets": "Add target markets to your profile, or pick any market below.",
+    "exportersOnly": "Export readiness is available to exporter accounts.",
+    "lastScored": "Last scored"
   }
 }

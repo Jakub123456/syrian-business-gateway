@@ -44,12 +44,34 @@ model Company {
   countryIso2   String
   verification  String           @default("UNVERIFIED")
   isDraft       Boolean          @default(false)
-  exporter      ExporterProfile?
-  importer      ImporterProfile?
-  products      Product[]
-  createdAt     DateTime         @default(now())
+  exporter        ExporterProfile?
+  importer        ImporterProfile?
+  products        Product[]
+  readinessScores ReadinessScore[]
+  createdAt       DateTime         @default(now())
 
   @@index([type, verification])
+}
+
+// Phase 4 — export-readiness scoring. The integer score + breakdown come from the
+// deterministic rubric (lib/readiness/rubric.ts, the source of truth); narrative is
+// either a deterministic explanation or a Claude-generated one (source = rules | ai).
+model ReadinessScore {
+  id                String   @id @default(cuid())
+  company           Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId         String
+  targetCountryIso2 String
+  score             Int
+  band              String // low | medium | high
+  breakdown         String // JSON of the scored dimensions
+  topGaps           String   @default("[]") // JSON string[]
+  narrative         String?
+  source            String   @default("rules") // rules | ai
+  model             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([companyId, targetCountryIso2])
 }
 
 model ExporterProfile {

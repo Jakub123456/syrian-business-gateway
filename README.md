@@ -43,6 +43,17 @@ EN/AR + RTL.
 - Dashboard reads the logged-in company from the DB and renders its profile.
 - Draft autosave still resumes a half-finished wizard (password excluded from storage).
 
+**Phase 4 export-readiness scoring** (`lib/readiness/`, `/dashboard/readiness`)
+- **Deterministic rubric** (`rubric.ts`) is the source of truth: a weighted 0–100 across
+  six dimensions (certifications, standards, docs, capacity, experience, completeness),
+  scored from the exporter profile vs. the target market's requirements. Auditable and stable.
+- **Claude narrative layer** (`ai.ts`, `@anthropic-ai/sdk`, `claude-opus-4-8`, Zod-validated
+  structured output) explains and prioritises the gaps — it never changes the number, and
+  **gracefully falls back** to a deterministic explanation when `ANTHROPIC_API_KEY` is unset.
+- Results persist to `ReadinessScore` (upsert per company+market); the dashboard shows a
+  score gauge, per-dimension bars, prioritised actions, and a rules/AI source badge.
+- Verify the rubric: `node --experimental-strip-types scripts/test-rubric.ts`.
+
 ## Data layers
 
 - **Users / companies / products** → Prisma + SQLite (`lib/db.ts`).
