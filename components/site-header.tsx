@@ -7,8 +7,8 @@ export function SiteHeader({ locale, dict, authed }: { locale: Locale; dict: Dic
   const base = `/${locale}`;
   const navLinks = [
     { href: base, label: dict.nav.home },
-    { href: `${base}/explorer`, label: dict.nav.explorer },
     { href: `${base}/directory`, label: dict.nav.directory },
+    { href: `${base}/requests`, label: dict.nav.requests },
   ];
 
   return (

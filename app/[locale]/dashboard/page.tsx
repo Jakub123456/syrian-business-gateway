@@ -128,16 +128,19 @@ export default async function DashboardPage({
               </span>
             </Link>
           ) : (
-            <div className="flex flex-col items-center rounded-2xl border border-dashed border-line bg-surface p-6 text-center">
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+            <Link
+              href={`/${locale}/dashboard/requests`}
+              className="flex flex-col items-center rounded-2xl border border-gold-400/40 bg-gold-400/10 p-6 text-center transition hover:border-gold-500 hover:shadow"
+            >
+              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-surface text-gold-600">
                 <Icon name="inbox" className="h-6 w-6" />
               </span>
-              <h3 className="mt-3 font-semibold text-brand-800">{dict.role.importerB1}</h3>
-              <p className="mt-2 text-sm text-muted">{dict.dashboard.body}</p>
-              <span className="mt-4 inline-block rounded-full bg-gold-400/15 px-3 py-1 text-sm font-medium text-gold-600">
-                {dict.common.comingSoon}
+              <h3 className="mt-3 font-semibold text-brand-800">{dict.dashboard.requestsCard}</h3>
+              <p className="mt-2 text-sm text-muted">{dict.dashboard.requestsCardBody}</p>
+              <span className="mt-4 inline-block rounded-full bg-gold-500 px-4 py-1.5 text-sm font-semibold text-white">
+                {dict.dashboard.openRequests}
               </span>
-            </div>
+            </Link>
           )}
         </div>
       )}

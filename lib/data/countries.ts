@@ -1,4 +1,5 @@
-// Seed data for the Global Market (Country) Explorer.
+// Country reference data — markets used by the registration wizards (target/sourcing
+// markets) and by readiness scoring (per-country import requirements).
 // 37 countries across 7 regions. Region counts (must total 37):
 //   Middle East 9 · Europe 11 · Asia 7 · North America 3 · Africa 3 · South America 2 · Oceania 2
 // Requirement content here is illustrative placeholder pending the authoritative trade-data

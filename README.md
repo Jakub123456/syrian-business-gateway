@@ -43,6 +43,13 @@ EN/AR + RTL.
 - Dashboard reads the logged-in company from the DB and renders its profile.
 - Draft autosave still resumes a half-finished wizard (password excluded from storage).
 
+**Phase 4 import requests** (`lib/demand/`, `/requests`, `/dashboard/requests`)
+- Importers post **"requests for imports"** from their dashboard (`createDemandRequest` /
+  `setDemandStatus` / `deleteDemandRequest` server actions, role-gated to importers).
+- Public **Import Requests directory** (`/requests`) lists OPEN requests with category +
+  search filters; cards show the buyer, destination market, quantity and date.
+- `DemandRequest` model (+ migration). Seed sample requests: `node scripts/seed-demands.mjs`.
+
 **Phase 4 export-readiness scoring** (`lib/readiness/`, `/dashboard/readiness`)
 - **Deterministic rubric** (`rubric.ts`) is the source of truth: a weighted 0–100 across
   six dimensions (certifications, standards, docs, capacity, experience, completeness),

@@ -85,9 +85,9 @@ export default async function ExporterProfilePage({
             {ex.targetMarkets.map((iso) => {
               const c = getCountry(iso);
               return (
-                <Link key={iso} href={`/${locale}/explorer/${iso.toLowerCase()}`} className="rounded-full bg-brand-50 px-3 py-1 text-sm text-brand-700 hover:bg-brand-100">
+                <span key={iso} className="rounded-full bg-brand-50 px-3 py-1 text-sm text-brand-700">
                   {c ? `${c.flag} ${loc === "ar" ? c.nameAr : c.nameEn}` : iso}
-                </Link>
+                </span>
               );
             })}
           </div>

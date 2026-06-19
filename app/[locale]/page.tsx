@@ -48,10 +48,10 @@ export default async function HomePage({
               {dict.home.registerImporter}
             </Link>
             <Link
-              href={`${base}/explorer`}
+              href={`${base}/directory`}
               className="rounded-lg border border-brand-300 bg-surface px-6 py-3 font-semibold text-brand-700 hover:bg-brand-50"
             >
-              {dict.home.exploreCountries}
+              {dict.nav.directory}
             </Link>
           </div>
           <p className="mt-6 text-sm text-muted">

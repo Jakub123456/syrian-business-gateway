@@ -48,9 +48,28 @@ model Company {
   importer        ImporterProfile?
   products        Product[]
   readinessScores ReadinessScore[]
+  demandRequests  DemandRequest[]
   createdAt       DateTime         @default(now())
 
   @@index([type, verification])
+}
+
+// Phase 4 — importer-posted "requests for imports". Browsable in the public import-requests
+// directory; created and managed by importers from their dashboard.
+model DemandRequest {
+  id                String   @id @default(cuid())
+  importer          Company  @relation(fields: [importerId], references: [id], onDelete: Cascade)
+  importerId        String
+  category          String // Industry
+  title             String
+  description       String
+  quantity          String?
+  targetCountryIso2 String?
+  status            String   @default("OPEN") // OPEN | CLOSED
+  createdAt         DateTime @default(now())
+
+  @@index([category, status])
+  @@index([importerId])
 }
 
 // Phase 4 — export-readiness scoring. The integer score + breakdown come from the

@@ -3,8 +3,8 @@
   "beta": "Beta",
   "nav": {
     "home": "Home",
-    "explorer": "Country Explorer",
     "directory": "Exporter Directory",
+    "requests": "Import Requests",
     "signIn": "Sign In",
     "getStarted": "Get Started"
   },
@@ -36,7 +36,6 @@
     "subtitle": "An AI-powered B2B platform that matches Syrian exporters with global buyers — and auto-generates tailored development plans to close the export-readiness gap, deal by deal.",
     "registerExporter": "Register as Exporter",
     "registerImporter": "Register as Importer",
-    "exploreCountries": "Explore Countries",
     "feature1Title": "Matchmaking",
     "feature1Body": "We pair Syrian supply with verified global demand by sector and market.",
     "feature2Title": "Readiness scoring",
@@ -99,21 +98,6 @@
     "doneTitle": "Profile submitted",
     "doneBody": "Thanks — your profile is saved. Our team will review it and you'll be matched with relevant buyers."
   },
-  "explorer": {
-    "title": "Global Market Explorer",
-    "subtitle": "Discover what every country imports, what standards it requires, and which trade alliances shape its market access rules.",
-    "allCountries": "All Countries",
-    "selectRegion": "Select a Region",
-    "selectRegionHint": "Click a region to explore its countries and import requirements",
-    "countries": "countries",
-    "topImports": "Top imports",
-    "tradeBlocs": "Trade alliances",
-    "requirements": "Import requirements",
-    "standards": "Standards",
-    "certsRequired": "Certifications required",
-    "noBloc": "No listed trade bloc",
-    "backToExplorer": "Back to explorer"
-  },
   "directory": {
     "title": "Exporter Directory",
     "subtitle": "Browse verified Syrian exporters by sector, market and readiness.",
@@ -141,7 +125,10 @@
     "pendingReview": "Pending review",
     "readinessCard": "Export readiness",
     "readinessCardBody": "Score your company against a target market and get a plan to close the gap.",
-    "openReadiness": "Open readiness check"
+    "openReadiness": "Open readiness check",
+    "requestsCard": "Import requests",
+    "requestsCardBody": "Post what you want to source and manage your open requests.",
+    "openRequests": "Manage requests"
   },
   "readiness": {
     "title": "Export Readiness",
@@ -161,5 +148,44 @@
     "noTargets": "Add target markets to your profile, or pick any market below.",
     "exportersOnly": "Export readiness is available to exporter accounts.",
     "lastScored": "Last scored"
+  },
+  "requests": {
+    "title": "Import Requests",
+    "subtitle": "Browse what international buyers want to source from Syria.",
+    "search": "Search requests…",
+    "filterCategory": "Category",
+    "results": "open requests",
+    "noResults": "No open requests match your filters.",
+    "postedBy": "Posted by",
+    "market": "Market",
+    "quantity": "Quantity",
+    "posted": "Posted",
+    "open": "Open",
+    "ctaImporter": "Post an import request"
+  },
+  "requestForm": {
+    "manageTitle": "My import requests",
+    "manageSubtitle": "Post what you want to source from Syrian exporters, then manage your open requests.",
+    "importersOnly": "Posting import requests is available to importer accounts.",
+    "new": "Post a new request",
+    "fTitle": "Title",
+    "fTitlePlaceholder": "e.g. Bulk extra-virgin olive oil, 2 containers",
+    "fCategory": "Category",
+    "fDescription": "Description",
+    "fDescriptionPlaceholder": "Specs, certifications required, packaging, timeline…",
+    "fQuantity": "Quantity",
+    "fQuantityPlaceholder": "e.g. 2 x 20ft containers / month",
+    "fMarket": "Destination market",
+    "submit": "Post request",
+    "posting": "Posting…",
+    "yours": "Your requests",
+    "none": "You haven't posted any requests yet.",
+    "selectCategory": "Select a category",
+    "ownMarket": "My market (default)",
+    "close": "Close",
+    "reopen": "Reopen",
+    "delete": "Delete",
+    "statusOpen": "Open",
+    "statusClosed": "Closed"
   }
 }
