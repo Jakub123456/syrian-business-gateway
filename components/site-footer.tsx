@@ -34,7 +34,7 @@ export function SiteFooter({ locale, dict }: { locale: Locale; dict: Dictionary 
   ];
 
   return (
-    <footer className="mt-16 border-t border-line bg-surface">
+    <footer className="mt-16 border-t border-line bg-surface print:hidden">
       <div className="container-page py-12">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand + social */}

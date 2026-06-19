@@ -12,22 +12,18 @@ export type ReadinessResponse =
   | { ok: true; result: ReadinessResult; narrative: Narrative; countryNameEn: string }
   | { ok: false; error: string };
 
-export async function computeReadiness(targetIso2: string): Promise<ReadinessResponse> {
-  const session = await getSession();
-  if (!session) return { ok: false, error: "Not signed in" };
-  if (session.role !== "EXPORTER") return { ok: false, error: "Readiness scoring is for exporters" };
+type ExporterCompany = NonNullable<Awaited<ReturnType<typeof loadExporter>>>;
 
-  const country = getCountry(targetIso2);
-  if (!country) return { ok: false, error: "Unknown country" };
-
-  const company = await db.company.findUnique({
-    where: { ownerId: session.uid },
+async function loadExporter(uid: string) {
+  return db.company.findUnique({
+    where: { ownerId: uid },
     include: { exporter: true, products: true },
   });
-  if (!company?.exporter) return { ok: false, error: "Complete your exporter profile first" };
+}
 
-  const ex = company.exporter;
-  const input: ExporterInput = {
+function toInput(company: ExporterCompany): ExporterInput {
+  const ex = company.exporter!;
+  return {
     sectors: fromJsonList(ex.sectors) as Industry[],
     certifications: fromJsonList(ex.certifications),
     exportStage: ex.exportStage,
@@ -43,7 +39,20 @@ export async function computeReadiness(targetIso2: string): Promise<ReadinessRes
     hasDescription: !!company.descriptionEn,
     hasLogo: !!company.logoUrl,
   };
+}
 
+export async function computeReadiness(targetIso2: string): Promise<ReadinessResponse> {
+  const session = await getSession();
+  if (!session) return { ok: false, error: "Not signed in" };
+  if (session.role !== "EXPORTER") return { ok: false, error: "Readiness scoring is for exporters" };
+
+  const country = getCountry(targetIso2);
+  if (!country) return { ok: false, error: "Unknown country" };
+
+  const company = await loadExporter(session.uid);
+  if (!company?.exporter) return { ok: false, error: "Complete your exporter profile first" };
+
+  const input = toInput(company);
   const result = scoreReadiness(input, country);
   const narrative = await generateNarrative(result, country, company.nameEn);
 
@@ -72,4 +81,43 @@ export async function computeReadiness(targetIso2: string): Promise<ReadinessRes
   });
 
   return { ok: true, result, narrative, countryNameEn: country.nameEn };
+}
+
+// VAS — multi-market comparison. Scores the exporter against every target market in one
+// pass (deterministic only, no LLM) and returns a ranked list. Lets an exporter see which
+// market they're most ready for before committing.
+export type MarketScore = {
+  iso2: string;
+  nameEn: string;
+  nameAr: string;
+  flag: string;
+  score: number;
+  band: ReadinessResult["band"];
+};
+export type CompareResponse =
+  | { ok: true; markets: MarketScore[] }
+  | { ok: false; error: string };
+
+export async function compareReadiness(): Promise<CompareResponse> {
+  const session = await getSession();
+  if (!session) return { ok: false, error: "Not signed in" };
+  if (session.role !== "EXPORTER") return { ok: false, error: "Readiness scoring is for exporters" };
+
+  const company = await loadExporter(session.uid);
+  if (!company?.exporter) return { ok: false, error: "Complete your exporter profile first" };
+
+  const targets = fromJsonList(company.exporter.targetMarkets);
+  if (targets.length === 0) return { ok: false, error: "Add target markets to your profile first" };
+
+  const input = toInput(company);
+  const markets: MarketScore[] = targets
+    .map((iso) => getCountry(iso))
+    .filter((c): c is NonNullable<typeof c> => !!c)
+    .map((country) => {
+      const r = scoreReadiness(input, country);
+      return { iso2: country.iso2, nameEn: country.nameEn, nameAr: country.nameAr, flag: country.flag, score: r.score, band: r.band };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  return { ok: true, markets };
 }

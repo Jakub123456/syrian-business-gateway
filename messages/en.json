@@ -197,7 +197,15 @@
     "ruleBased": "Rule-based",
     "noTargets": "Add target markets to your profile, or pick any market below.",
     "exportersOnly": "Export readiness is available to exporter accounts.",
-    "lastScored": "Last scored"
+    "lastScored": "Last scored",
+    "compare": "Compare my markets",
+    "comparing": "Comparing…",
+    "compareTitle": "Readiness by market",
+    "compareHint": "How ready you are for each of your target markets — best fit first.",
+    "bestFit": "Best fit",
+    "printReport": "Print / Save as PDF",
+    "reportTitle": "Export Readiness Report",
+    "generatedOn": "Generated"
   },
   "requests": {
     "title": "Import Requests",
@@ -236,6 +244,10 @@
     "reopen": "Reopen",
     "delete": "Delete",
     "statusOpen": "Open",
-    "statusClosed": "Closed"
+    "statusClosed": "Closed",
+    "suggested": "Suggested suppliers",
+    "suggestedHint": "Directory exporters in this sector, ranked by fit — evaluate and reach out.",
+    "suggestedNone": "No directory suppliers in this sector yet.",
+    "targetsThisMarket": "targets this market"
   }
 }

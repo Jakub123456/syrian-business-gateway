@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { INDUSTRIES, label, type Industry } from "@/lib/taxonomy";
 import { COUNTRIES } from "@/lib/data/countries";
 import { createDemandRequest, setDemandStatus, deleteDemandRequest } from "@/lib/demand/actions";
+import { shortlistSuppliers } from "@/lib/match/shortlist";
 
 export type OwnRequest = {
   id: string;
@@ -144,11 +146,42 @@ export function RequestsManager({
                     {f.delete}
                   </button>
                 </div>
+                <Suggested request={r} locale={locale} dict={dict} />
               </li>
             ))}
           </ul>
         )}
       </div>
+    </div>
+  );
+}
+
+// VAS — rules-based supplier shortlist for an importer's request (matching-lite).
+function Suggested({ request, locale, dict }: { request: OwnRequest; locale: Locale; dict: Dictionary }) {
+  const f = dict.requestForm;
+  const list = shortlistSuppliers(request.category, request.targetCountryIso2);
+  return (
+    <div className="mt-4 border-t border-line pt-3">
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted">{f.suggested}</p>
+      {list.length === 0 ? (
+        <p className="mt-1 text-xs text-muted">{f.suggestedNone}</p>
+      ) : (
+        <ul className="mt-2 space-y-1.5">
+          {list.map((s) => (
+            <li key={s.exporter.id} className="flex flex-wrap items-center gap-2 text-sm">
+              <Link href={`/${locale}/directory/${s.exporter.id}`} className="font-medium text-brand-700 hover:underline">
+                {locale === "ar" ? s.exporter.nameAr : s.exporter.nameEn}
+              </Link>
+              {s.verified && (
+                <span className="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-medium text-brand-700">✓ {dict.common.verified}</span>
+              )}
+              {s.targetsMarket && (
+                <span className="rounded-full bg-gold-400/15 px-2 py-0.5 text-xs font-medium text-gold-600">{f.targetsThisMarket}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

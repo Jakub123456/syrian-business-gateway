@@ -12,7 +12,7 @@ export function SiteHeader({ locale, dict, authed }: { locale: Locale; dict: Dic
   ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur print:hidden">
       <div className="container-page flex h-16 items-center gap-6">
         <Link href={base} className="flex items-center gap-2 font-bold text-brand-700">
           <span aria-hidden className="text-xl">🇸🇾</span>

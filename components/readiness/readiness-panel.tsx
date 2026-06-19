@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
-import { computeReadiness, type ReadinessResponse } from "@/lib/readiness/actions";
+import { computeReadiness, compareReadiness, type ReadinessResponse, type MarketScore } from "@/lib/readiness/actions";
 import type { ReadinessResult } from "@/lib/readiness/rubric";
 import { Icon } from "@/components/icon";
 
@@ -34,6 +34,8 @@ export function ReadinessPanel({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [data, setData] = useState<Extract<ReadinessResponse, { ok: true }> | null>(null);
+  const [comparing, setComparing] = useState(false);
+  const [comparison, setComparison] = useState<MarketScore[] | null>(null);
 
   async function run() {
     if (!target) return;
@@ -45,12 +47,22 @@ export function ReadinessPanel({
     setData(res);
   }
 
+  async function compare() {
+    setComparing(true);
+    setError("");
+    const res = await compareReadiness();
+    setComparing(false);
+    if (!res.ok) return setError(res.error);
+    setComparison(res.markets);
+  }
+
   const bandLabel = (band: ReadinessResult["band"]) =>
     band === "high" ? r.bandHigh : band === "medium" ? r.bandMedium : r.bandLow;
+  const barColor = (band: string) => (band === "high" ? "bg-brand-500" : band === "medium" ? "bg-gold-400" : "bg-red-400");
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end gap-3 rounded-2xl border border-line bg-surface p-5">
+      <div className="flex flex-wrap items-end gap-3 rounded-2xl border border-line bg-surface p-5 print:hidden">
         <label className="block">
           <span className="mb-1.5 block text-sm font-medium text-brand-800">{r.selectMarket}</span>
           <select
@@ -71,12 +83,65 @@ export function ReadinessPanel({
         >
           {loading ? r.running : r.run}
         </button>
+        <button
+          type="button"
+          onClick={compare}
+          disabled={comparing}
+          className="rounded-lg border border-brand-300 px-5 py-2.5 text-sm font-semibold text-brand-700 hover:bg-brand-50 disabled:opacity-60"
+        >
+          {comparing ? r.comparing : r.compare}
+        </button>
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-600 print:hidden">{error}</p>}
+
+      {/* VAS: multi-market comparison */}
+      {comparison && comparison.length > 0 && (
+        <div className="rounded-2xl border border-line bg-surface p-6 print:hidden">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted">{r.compareTitle}</h3>
+          <p className="mt-1 text-sm text-muted">{r.compareHint}</p>
+          <div className="mt-4 space-y-3">
+            {comparison.map((m, i) => (
+              <button
+                key={m.iso2}
+                type="button"
+                onClick={() => { setTarget(m.iso2); }}
+                className="block w-full text-start"
+              >
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-brand-800">
+                    {m.flag} {locale === "ar" ? m.nameAr : m.nameEn}
+                    {i === 0 && <span className="ms-2 rounded-full bg-brand-100 px-2 py-0.5 text-xs font-medium text-brand-700">{r.bestFit}</span>}
+                  </span>
+                  <span className={`font-semibold ${BAND_COLOR[m.band]}`}>{m.score}</span>
+                </div>
+                <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-canvas">
+                  <div className={`h-full rounded-full ${barColor(m.band)}`} style={{ width: `${m.score}%` }} />
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {data && (
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="space-y-4">
+          {/* Print-only report header */}
+          <div className="hidden print:block">
+            <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">{dict.brand}</p>
+            <h2 className="text-xl font-bold text-brand-900">{r.reportTitle} — {data.countryNameEn}</h2>
+            <p className="text-sm text-muted">{r.generatedOn} {new Date().toLocaleDateString(locale === "ar" ? "ar" : "en")}</p>
+          </div>
+          <div className="flex justify-end print:hidden">
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-brand-700 hover:bg-brand-50"
+            >
+              {r.printReport}
+            </button>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-3">
           {/* Score gauge */}
           <div className="flex flex-col items-center justify-center rounded-2xl border border-line bg-surface p-6">
             <div className={`flex h-32 w-32 flex-col items-center justify-center rounded-full border-8 ${BAND_RING[data.result.band]}`}>
@@ -141,6 +206,7 @@ export function ReadinessPanel({
                 </ol>
               </div>
             )}
+          </div>
           </div>
         </div>
       )}
