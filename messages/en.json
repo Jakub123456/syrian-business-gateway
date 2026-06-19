@@ -1,6 +1,19 @@
 {
   "brand": "Syrian Business Gateway",
   "beta": "Beta",
+  "footer": {
+    "tagline": "Connecting Syrian exporters with global buyers — deal by deal.",
+    "explore": "Explore",
+    "company": "Company",
+    "contactTitle": "Contact",
+    "about": "About",
+    "howItWorks": "How it works",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "followUs": "Follow us",
+    "rights": "All rights reserved.",
+    "unavailable": "Coming soon"
+  },
   "nav": {
     "home": "Home",
     "directory": "Exporter Directory",

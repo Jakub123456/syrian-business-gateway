@@ -19,7 +19,14 @@ export type IconName =
   | "sun"
   | "star"
   | "mountains"
-  | "wave";
+  | "wave"
+  // contact / social
+  | "mail"
+  | "phone"
+  | "pin"
+  | "linkedin"
+  | "instagram"
+  | "x";
 
 const PATHS: Record<IconName, React.ReactNode> = {
   link: (
@@ -103,6 +110,33 @@ const PATHS: Record<IconName, React.ReactNode> = {
       <path d="M3 14c2-2 4-2 6 0s4 2 6 0 4-2 6 0" />
     </>
   ),
+  mail: (
+    <>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3.5 7l8.5 6 8.5-6" />
+    </>
+  ),
+  phone: <path d="M5 4h3l1.6 4-2 1.2a11 11 0 0 0 5.2 5.2l1.2-2 4 1.6v3a2 2 0 0 1-2.2 2A16 16 0 0 1 3.2 6.2 2 2 0 0 1 5 4z" />,
+  pin: (
+    <>
+      <path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z" />
+      <circle cx="12" cy="10" r="2.5" />
+    </>
+  ),
+  linkedin: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M7 10v7M7 7.5v.01M11 17v-4a2 2 0 0 1 4 0v4" />
+    </>
+  ),
+  instagram: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17" cy="7" r="0.6" />
+    </>
+  ),
+  x: <path d="M5 5l14 14M19 5L5 19" />,
 };
 
 export function Icon({ name, className }: { name: IconName; className?: string }) {
