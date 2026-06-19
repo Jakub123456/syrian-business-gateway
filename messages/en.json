@@ -106,7 +106,9 @@
     "filterStage": "Export stage",
     "filterVerified": "Verified only",
     "results": "exporters",
-    "noResults": "No exporters match your filters."
+    "noResults": "No exporters match your filters.",
+    "mapTitle": "Exporters across Syria",
+    "mapSubtitle": "Where listed exporters are based, by governorate. Hover a marker to see who's there."
   },
   "signin": {
     "title": "Sign in to SBG",
