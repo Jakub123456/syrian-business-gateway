@@ -1,20 +1,22 @@
-// Active dev schema — SQLite (zero-infra local DB). Production target is Postgres
-// (see plan.md §4): switching means `provider = "postgresql"`, turning the JSON-string
-// list fields back into native arrays, and the string status/role fields into enums.
+// Postgres (Neon) — same schema in local dev and on Vercel.
 //
-// SQLite has no enums or scalar lists, so:
-//   - enum-typed columns (role, type, exportStage, verification, category) are validated
-//     strings, checked in app code against lib/taxonomy.ts.
-//   - list columns (sectors, targetMarkets, …) are JSON-encoded strings; (de)serialized
-//     by the helpers in lib/serialize.ts.
+// Enum-typed columns (role, type, exportStage, verification, category) are stored as
+// validated strings (checked in app code against lib/taxonomy.ts), and list columns
+// (sectors, targetMarkets, …) as JSON-encoded text via lib/serialize.ts. These were
+// originally SQLite accommodations; they work unchanged on Postgres, so the move is a
+// provider swap rather than a data-model rewrite.
+//
+// DATABASE_URL = pooled connection (pgbouncer) used by the app at runtime.
+// DIRECT_URL    = direct connection used by Prisma Migrate (migrate deploy/dev).
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {

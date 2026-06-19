@@ -11,8 +11,9 @@ See [`plan.md`](./plan.md) for the full build plan, data model, and phased roadm
 - **Tailwind CSS v4** (CSS-config), brand olive-green + gold palette
 - **i18n**: dependency-free dictionary loader, **English + Arabic with full RTL**
   (`app/[locale]`, locale negotiation in `proxy.ts` — Next 16's renamed middleware)
-- **Database**: **Prisma + SQLite** (dev) — schema in `prisma/schema.prisma`. Postgres
-  is the prod target (see `plan.md` §4 and the schema header for the switch).
+- **Database**: **Prisma + Postgres (Neon)** — same schema in dev and prod
+  (`prisma/schema.prisma`). Enum columns are validated strings and list columns are JSON
+  text (carried over from the earlier SQLite phase; they work unchanged on Postgres).
 - **Auth**: hand-rolled session — signed JWT (`jose`) in an httpOnly cookie + `bcryptjs`
   password hashing. `proxy.ts` gates `/[locale]/dashboard`.
 
@@ -20,14 +21,17 @@ See [`plan.md`](./plan.md) for the full build plan, data model, and phased roadm
 
 ```bash
 npm install
-npm run db:migrate   # creates prisma/dev.db (DATABASE_URL in .env / .env.local)
+cp .env.example .env.local && cp .env.example .env   # fill in Neon URLs + AUTH_SECRET
+npm run db:deploy    # apply migrations to your Postgres
+npm run db:seed      # optional: sample import requests
 npm run dev          # http://localhost:3000  → redirects to /en
 ```
 
-`.env`/`.env.local` need `DATABASE_URL` and `AUTH_SECRET` (generate the latter with
-`node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`).
+`.env`/`.env.local` need **`DATABASE_URL`** (Neon pooled), **`DIRECT_URL`** (Neon direct),
+and **`AUTH_SECRET`** (`node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`).
+For local dev, use a free **Neon dev branch** so you don't touch prod data.
 
-Try `/en` and `/ar` (RTL), `/en/explorer`, `/en/directory`, then register an exporter or
+Try `/en` and `/ar` (RTL), `/en/directory`, `/en/requests`, then register an exporter or
 importer — submitting creates a real account, signs you in, and lands on `/dashboard`.
 
 ## What's implemented
@@ -63,20 +67,37 @@ EN/AR + RTL.
 
 ## Data layers
 
-- **Users / companies / products** → Prisma + SQLite (`lib/db.ts`).
-- **Country Explorer & sample Directory** → static seed data in [`lib/data/`](./lib/data)
-  (correct for SEO-cached public content). The `Country` table can later be seeded from
-  `lib/data/countries.ts` if the Explorer needs to become editable.
-- SQLite has no enums/arrays, so enum columns are validated strings and list columns are
-  JSON text via [`lib/serialize.ts`](./lib/serialize.ts). Switching to Postgres reverts
-  these to native enums/arrays.
+- **Users / companies / products / requests / readiness** → Prisma + Postgres (`lib/db.ts`).
+- **Country reference + sample Exporter Directory** → static data in [`lib/data/`](./lib/data)
+  (countries power registration markets + readiness; sample exporters seed the directory).
+- Enum columns are validated strings and list columns are JSON text via
+  [`lib/serialize.ts`](./lib/serialize.ts).
+
+## Deploy to Vercel
+
+1. **Create a Neon Postgres** (neon.tech, or Vercel → Storage → Postgres, which is Neon).
+   Copy two connection strings: the **pooled** one (host has `-pooler`) and the **direct** one.
+2. **Push to GitHub**, then **Import the repo** in Vercel (it auto-detects Next.js).
+3. **Set env vars** in Vercel (Production + Preview):
+   - `DATABASE_URL` = pooled URL + `?sslmode=require&pgbouncer=true&connection_limit=1`
+   - `DIRECT_URL` = direct URL + `?sslmode=require`
+   - `AUTH_SECRET` = a 32-byte hex secret
+   - `ANTHROPIC_API_KEY` (optional)
+4. **Deploy.** `vercel.json` sets the build to
+   `prisma generate && prisma migrate deploy && next build`, so migrations apply on every
+   deploy automatically. (`prisma migrate deploy` uses `DIRECT_URL`.)
+5. *(Optional)* seed demo requests once: `DATABASE_URL=… DIRECT_URL=… npm run db:seed`.
+
+> Tip: put Vercel's function region near your Neon region. `proxy.ts` runs on the Edge
+> (uses only `jose`, no Prisma); all DB access is in Node server actions/components.
 
 ## DB scripts
 
 ```bash
-npm run db:migrate    # prisma migrate dev
+npm run db:deploy     # prisma migrate deploy (apply migrations — local or CI)
+npm run db:migrate    # prisma migrate dev (create a new migration in dev)
 npm run db:studio     # browse data
-npm run db:reset      # drop + re-migrate
+npm run db:seed       # sample import requests
 node scripts/smoke-auth.mjs   # end-to-end auth stack check (needs env vars loaded)
 ```
 
