@@ -7,10 +7,18 @@ import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { EXPORTERS } from "@/lib/data/exporters";
 import { INDUSTRIES, EXPORT_STAGES, GOVERNORATES, label, type Industry } from "@/lib/taxonomy";
 
-export function DirectoryBrowser({ locale, dict }: { locale: Locale; dict: Dictionary }) {
+export function DirectoryBrowser({
+  locale,
+  dict,
+  initialSector = "",
+}: {
+  locale: Locale;
+  dict: Dictionary;
+  initialSector?: Industry | "";
+}) {
   const d = dict.directory;
   const [q, setQ] = useState("");
-  const [sector, setSector] = useState<Industry | "">("");
+  const [sector, setSector] = useState<Industry | "">(initialSector);
   const [stage, setStage] = useState("");
   const [verifiedOnly, setVerifiedOnly] = useState(false);
 

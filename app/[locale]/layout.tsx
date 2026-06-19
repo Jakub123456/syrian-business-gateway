@@ -19,7 +19,7 @@ const appSans = IBM_Plex_Sans_Arabic({
 export const metadata: Metadata = {
   title: "Syrian Business Gateway",
   description:
-    "AI-powered B2B platform connecting Syrian exporters with global buyers.",
+    "B2B gateway connecting Syrian exporters with global buyers.",
 };
 
 export function generateStaticParams() {
