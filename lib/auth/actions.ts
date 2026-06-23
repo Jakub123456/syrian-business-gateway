@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { toJsonList } from "@/lib/serialize";
 import { hashPassword, verifyPassword } from "./password";
 import { setSessionCookie, clearSessionCookie, type Role } from "./session";
+import { rateLimit } from "@/lib/ratelimit";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -53,6 +54,8 @@ async function emailTaken(email: string): Promise<boolean> {
 }
 
 export async function registerExporter(raw: unknown): Promise<ActionResult> {
+  if (!(await rateLimit("register", { limit: 5, windowSec: 3600 })).success)
+    return { ok: false, error: "Too many sign-ups from this network. Please try again later." };
   const parsed = exporterSchema.safeParse(raw);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   const d = parsed.data;
@@ -101,6 +104,8 @@ export async function registerExporter(raw: unknown): Promise<ActionResult> {
 }
 
 export async function registerImporter(raw: unknown): Promise<ActionResult> {
+  if (!(await rateLimit("register", { limit: 5, windowSec: 3600 })).success)
+    return { ok: false, error: "Too many sign-ups from this network. Please try again later." };
   const parsed = importerSchema.safeParse(raw);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   const d = parsed.data;
@@ -138,6 +143,8 @@ export async function registerImporter(raw: unknown): Promise<ActionResult> {
 }
 
 export async function signInWithPassword(raw: unknown): Promise<ActionResult> {
+  if (!(await rateLimit("signin", { limit: 5, windowSec: 900 })).success)
+    return { ok: false, error: "Too many attempts. Please wait a few minutes and try again." };
   const parsed = credentials.safeParse(raw);
   if (!parsed.success) return { ok: false, error: "Enter a valid email and password" };
   const { email, password } = parsed.data;
