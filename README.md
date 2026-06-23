@@ -1,14 +1,15 @@
 # Syrian Business Gateway (SBG)
 
-AI-powered B2B platform connecting Syrian exporters with global buyers, with a Global
-Market (Country) Explorer and (Phase 4) auto-generated export-readiness development plans.
+B2B gateway connecting Syrian exporters with global buyers: a searchable exporter
+directory, an importer demand board, and export-readiness scoring — in English and Arabic.
 
-See [`plan.md`](./plan.md) for the full build plan, data model, and phased roadmap.
+See [`plan.md`](./plan.md) for the original build plan + data model, and [`docs/`](./docs)
+for planning notes (landing strategy, value-added services roadmap).
 
 ## Stack
 
 - **Next.js 16** (App Router, React 19, TypeScript, Turbopack)
-- **Tailwind CSS v4** (CSS-config), brand olive-green + gold palette
+- **Tailwind CSS v4** (CSS-config), muted-sage palette + line icons
 - **i18n**: dependency-free dictionary loader, **English + Arabic with full RTL**
   (`app/[locale]`, locale negotiation in `proxy.ts` — Next 16's renamed middleware)
 - **Database**: **Prisma + Postgres (Neon)** — same schema in dev and prod
@@ -36,9 +37,10 @@ importer — submitting creates a real account, signs you in, and lands on `/das
 
 ## What's implemented
 
-**Phases 0–3** — landing, role chooser, Country Explorer (37 countries / 7 regions /
-8 bloc filters / per-country requirements), Exporter Directory (search + filters), full
-EN/AR + RTL.
+**Phases 0–3** — dual-audience landing, role chooser, Exporter Directory (search +
+sector/stage/verified filters + OpenStreetMap map), full EN/AR + RTL. *(The Country
+Explorer was built then removed; its 37-country data still powers registration markets +
+readiness.)*
 
 **Phase 1 auth + persistence**
 - Registration wizards (exporter 3-step, importer 2-step) now collect a password,

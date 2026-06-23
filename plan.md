@@ -5,6 +5,14 @@
 
 **Status:** Beta / greenfield · **Stack:** Next.js + Postgres · **AI:** phased (Phase 4)
 
+> **Current state:** This is the original build plan; several choices evolved during
+> implementation. Live deviations: dependency-free dictionary i18n (not next-intl);
+> **Postgres on Neon** (not SQLite); hand-rolled **jose + bcrypt** auth (not Auth.js); the
+> **Country Explorer was removed** (its data still powers registration markets + readiness);
+> the exporter map uses **OpenStreetMap/Leaflet**; landing copy dropped AI/matchmaking
+> language. See the root [README](./README.md) for the accurate, current feature set, and
+> [docs/](./docs) for the other planning notes.
+
 ---
 
 ## 0. Key Decisions (and what was rejected)
