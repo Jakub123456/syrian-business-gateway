@@ -28,12 +28,15 @@ export default async function RequestsPage({
   const loc = locale as Locale;
   const session = await getSession();
 
-  const rows = await db.demandRequest.findMany({
-    where: { status: "OPEN" },
-    orderBy: { createdAt: "desc" },
-    include: { importer: { select: { nameEn: true, nameAr: true, countryIso2: true } } },
-    take: 200, // bound the query; add cursor pagination when volume warrants
-  });
+  // Resilient: render the empty state rather than 500 if the DB is unreachable.
+  const rows = await db.demandRequest
+    .findMany({
+      where: { status: "OPEN" },
+      orderBy: { createdAt: "desc" },
+      include: { importer: { select: { nameEn: true, nameAr: true, countryIso2: true } } },
+      take: 200, // bound the query; add cursor pagination when volume warrants
+    })
+    .catch(() => []);
 
   const items: RequestItem[] = rows.map((r) => {
     const country = r.targetCountryIso2 ? getCountry(r.targetCountryIso2) : undefined;
