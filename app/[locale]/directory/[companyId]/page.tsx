@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
-import { EXPORTERS, getExporter } from "@/lib/data/exporters";
+import { EXPORTERS } from "@/lib/data/exporters";
+import { getDirectoryExporter } from "@/lib/directory";
 import { getCountry } from "@/lib/data/countries";
 import { INDUSTRIES, EXPORT_STAGES, GOVERNORATES, label } from "@/lib/taxonomy";
 
@@ -17,7 +18,7 @@ export default async function ExporterProfilePage({
 }) {
   const { locale, companyId } = await params;
   if (!isLocale(locale)) notFound();
-  const ex = getExporter(companyId);
+  const ex = await getDirectoryExporter(companyId);
   if (!ex) notFound();
   const dict = await getDictionary(locale as Locale);
   const loc = locale as Locale;

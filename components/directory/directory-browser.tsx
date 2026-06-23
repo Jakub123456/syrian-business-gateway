@@ -4,16 +4,18 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
-import { EXPORTERS } from "@/lib/data/exporters";
+import type { Exporter } from "@/lib/data/exporters";
 import { INDUSTRIES, EXPORT_STAGES, GOVERNORATES, label, type Industry } from "@/lib/taxonomy";
 
 export function DirectoryBrowser({
   locale,
   dict,
+  exporters,
   initialSector = "",
 }: {
   locale: Locale;
   dict: Dictionary;
+  exporters: Exporter[];
   initialSector?: Industry | "";
 }) {
   const d = dict.directory;
@@ -33,7 +35,7 @@ export function DirectoryBrowser({
 
   const results = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    return EXPORTERS.filter((ex) => {
+    return exporters.filter((ex) => {
       if (verifiedOnly && !ex.verified) return false;
       if (sector && !ex.sectors.includes(sector)) return false;
       if (stage && ex.exportStage !== stage) return false;
@@ -46,7 +48,7 @@ export function DirectoryBrowser({
       }
       return true;
     });
-  }, [q, sector, stage, verifiedOnly]);
+  }, [exporters, q, sector, stage, verifiedOnly]);
 
   const inputClass =
     "rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-200";

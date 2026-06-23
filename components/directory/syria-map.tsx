@@ -5,7 +5,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
-import { EXPORTERS, type Exporter } from "@/lib/data/exporters";
+import type { Exporter } from "@/lib/data/exporters";
 import { GOVERNORATES, label } from "@/lib/taxonomy";
 
 // OpenStreetMap (Leaflet) tile map. Client-only — load without SSR.
@@ -17,16 +17,16 @@ const LeafletMap = dynamic(() => import("./leaflet-map"), {
 type Gov = (typeof GOVERNORATES)[number];
 type Group = { gov: Gov; list: Exporter[] };
 
-export function SyriaMap({ locale, dict }: { locale: Locale; dict: Dictionary }) {
+export function SyriaMap({ locale, dict, exporters }: { locale: Locale; dict: Dictionary; exporters: Exporter[] }) {
   const d = dict.directory;
   const [hovered, setHovered] = useState<string | null>(null);
 
   const groups: Group[] = useMemo(
     () =>
-      GOVERNORATES.map((gov) => ({ gov, list: EXPORTERS.filter((e) => e.governorate === gov.key) }))
+      GOVERNORATES.map((gov) => ({ gov, list: exporters.filter((e) => e.governorate === gov.key) }))
         .filter((x) => x.list.length > 0)
         .sort((a, b) => b.list.length - a.list.length),
-    [],
+    [exporters],
   );
   const maxCount = Math.max(1, ...groups.map((g) => g.list.length));
 
