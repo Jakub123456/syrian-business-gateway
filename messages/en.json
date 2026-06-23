@@ -1,6 +1,21 @@
 {
   "brand": "Syrian Business Gateway",
   "beta": "Beta",
+  "errors": {
+    "rateLimited": "Too many attempts. Please wait a few minutes and try again.",
+    "invalidInput": "Please check the form and try again.",
+    "invalidPassword": "Password must be at least 8 characters.",
+    "invalidWebsite": "Enter a valid website URL (including https://).",
+    "emailExists": "An account with this email already exists.",
+    "invalidCredentials": "Invalid email or password.",
+    "notSignedIn": "You're not signed in.",
+    "exportersOnly": "This is available to exporter accounts.",
+    "importersOnly": "Only importers can post requests.",
+    "profileIncomplete": "Complete your profile first.",
+    "unknownCountry": "Unknown country.",
+    "noTargetMarkets": "Add target markets to your profile first.",
+    "requestNotFound": "Request not found."
+  },
   "footer": {
     "tagline": "Connecting Syrian exporters with global buyers — deal by deal.",
     "explore": "Explore",
@@ -40,6 +55,7 @@
     "targetMarkets": "Target markets",
     "established": "Established",
     "haveAccount": "Already have an account?",
+    "skipToContent": "Skip to content",
     "terms": "By registering you agree to our Terms of Service",
     "comingSoon": "Coming soon"
   },

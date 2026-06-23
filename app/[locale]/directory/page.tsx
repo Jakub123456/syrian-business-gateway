@@ -1,10 +1,19 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { localeAlternates } from "@/lib/seo";
 import { INDUSTRIES, type Industry } from "@/lib/taxonomy";
 import { listDirectoryExporters } from "@/lib/directory";
 import { DirectoryBrowser } from "@/components/directory/directory-browser";
 import { SyriaMap } from "@/components/directory/syria-map";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isLocale(locale)) return {};
+  const dict = await getDictionary(locale as Locale);
+  return { title: dict.directory.title, description: dict.directory.subtitle, alternates: localeAlternates(locale as Locale, "/directory") };
+}
 
 export default async function DirectoryPage({
   params,

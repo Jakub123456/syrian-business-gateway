@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
@@ -5,10 +6,26 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { EXPORTERS } from "@/lib/data/exporters";
 import { getDirectoryExporter } from "@/lib/directory";
 import { getCountry } from "@/lib/data/countries";
+import { safeExternalUrl } from "@/lib/url";
+import { localeAlternates } from "@/lib/seo";
 import { INDUSTRIES, EXPORT_STAGES, GOVERNORATES, label } from "@/lib/taxonomy";
 
 export function generateStaticParams() {
   return EXPORTERS.map((e) => ({ companyId: e.id }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; companyId: string }>;
+}): Promise<Metadata> {
+  const { locale, companyId } = await params;
+  if (!isLocale(locale)) return {};
+  const ex = await getDirectoryExporter(companyId);
+  if (!ex) return {};
+  const name = locale === "ar" ? ex.nameAr : ex.nameEn;
+  const description = (locale === "ar" ? ex.descriptionAr : ex.descriptionEn) || "Syrian exporter on Syrian Business Gateway";
+  return { title: name, description, alternates: localeAlternates(locale as Locale, `/directory/${companyId}`) };
 }
 
 export default async function ExporterProfilePage({
@@ -30,8 +47,21 @@ export default async function ExporterProfilePage({
     return i ? label(i, loc) : key;
   };
 
+  // schema.org Organization for rich results.
+  const url = safeExternalUrl(ex.website);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: ex.nameEn,
+    ...(ex.descriptionEn ? { description: ex.descriptionEn } : {}),
+    ...(url ? { url } : {}),
+    address: { "@type": "PostalAddress", addressCountry: "SY", addressRegion: label(GOVERNORATES.find((g) => g.key === ex.governorate)!, "en") },
+    knowsAbout: ex.sectors.map((s) => label(INDUSTRIES.find((x) => x.key === s)!, "en")),
+  };
+
   return (
     <div className="container-page max-w-4xl py-12">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Link href={`/${locale}/directory`} className="inline-flex items-center gap-1 text-sm font-medium text-brand-700 hover:underline">
         <span className="flip-rtl">←</span> {dict.directory.title}
       </Link>
@@ -40,6 +70,11 @@ export default async function ExporterProfilePage({
         <div>
           <h1 className="text-3xl font-bold text-brand-900">{loc === "ar" ? ex.nameAr : ex.nameEn}</h1>
           <p className="mt-1 text-sm text-muted">{govLabel} · {stageLabel} · {dict.common.established} {ex.yearEstablished}</p>
+          {safeExternalUrl(ex.website) && (
+            <a href={safeExternalUrl(ex.website)!} target="_blank" rel="noopener noreferrer nofollow" className="mt-1 inline-block text-sm font-medium text-brand-700 hover:underline">
+              {ex.website!.replace(/^https?:\/\//, "")}
+            </a>
+          )}
         </div>
         {ex.verified && (
           <span className="shrink-0 rounded-full bg-brand-100 px-3 py-1 text-sm font-medium text-brand-700">

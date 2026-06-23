@@ -1,12 +1,21 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getSession } from "@/lib/auth/session";
 import { db } from "@/lib/db";
+import { localeAlternates } from "@/lib/seo";
 import { getCountry } from "@/lib/data/countries";
 import type { Industry } from "@/lib/taxonomy";
 import { RequestsBrowser, type RequestItem } from "@/components/requests/requests-browser";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isLocale(locale)) return {};
+  const dict = await getDictionary(locale as Locale);
+  return { title: dict.requests.title, description: dict.requests.subtitle, alternates: localeAlternates(locale as Locale, "/requests") };
+}
 
 export default async function RequestsPage({
   params,
@@ -23,6 +32,7 @@ export default async function RequestsPage({
     where: { status: "OPEN" },
     orderBy: { createdAt: "desc" },
     include: { importer: { select: { nameEn: true, nameAr: true, countryIso2: true } } },
+    take: 200, // bound the query; add cursor pagination when volume warrants
   });
 
   const items: RequestItem[] = rows.map((r) => {

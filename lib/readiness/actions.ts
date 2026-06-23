@@ -43,14 +43,14 @@ function toInput(company: ExporterCompany): ExporterInput {
 
 export async function computeReadiness(targetIso2: string): Promise<ReadinessResponse> {
   const session = await getSession();
-  if (!session) return { ok: false, error: "Not signed in" };
-  if (session.role !== "EXPORTER") return { ok: false, error: "Readiness scoring is for exporters" };
+  if (!session) return { ok: false, error: "notSignedIn" };
+  if (session.role !== "EXPORTER") return { ok: false, error: "exportersOnly" };
 
   const country = getCountry(targetIso2);
-  if (!country) return { ok: false, error: "Unknown country" };
+  if (!country) return { ok: false, error: "unknownCountry" };
 
   const company = await loadExporter(session.uid);
-  if (!company?.exporter) return { ok: false, error: "Complete your exporter profile first" };
+  if (!company?.exporter) return { ok: false, error: "profileIncomplete" };
 
   const input = toInput(company);
   const result = scoreReadiness(input, country);
@@ -100,14 +100,14 @@ export type CompareResponse =
 
 export async function compareReadiness(): Promise<CompareResponse> {
   const session = await getSession();
-  if (!session) return { ok: false, error: "Not signed in" };
-  if (session.role !== "EXPORTER") return { ok: false, error: "Readiness scoring is for exporters" };
+  if (!session) return { ok: false, error: "notSignedIn" };
+  if (session.role !== "EXPORTER") return { ok: false, error: "exportersOnly" };
 
   const company = await loadExporter(session.uid);
-  if (!company?.exporter) return { ok: false, error: "Complete your exporter profile first" };
+  if (!company?.exporter) return { ok: false, error: "profileIncomplete" };
 
   const targets = fromJsonList(company.exporter.targetMarkets);
-  if (targets.length === 0) return { ok: false, error: "Add target markets to your profile first" };
+  if (targets.length === 0) return { ok: false, error: "noTargetMarkets" };
 
   const input = toInput(company);
   const markets: MarketScore[] = targets

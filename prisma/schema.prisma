@@ -54,6 +54,7 @@ model Company {
   createdAt       DateTime         @default(now())
 
   @@index([type, verification])
+  @@index([type, isDraft])
 }
 
 // Phase 4 — importer-posted "requests for imports". Browsable in the public import-requests

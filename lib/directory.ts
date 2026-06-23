@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { db } from "@/lib/db";
 import { fromJsonList } from "@/lib/serialize";
 import { EXPORTERS, type Exporter } from "@/lib/data/exporters";
@@ -12,6 +13,7 @@ type CompanyRow = {
   id: string;
   nameEn: string;
   nameAr: string | null;
+  website: string | null;
   descriptionEn: string | null;
   descriptionAr: string | null;
   verification: string;
@@ -42,15 +44,17 @@ function mapCompany(c: CompanyRow): Exporter {
     yearEstablished: ex.yearEstablished ?? 0,
     targetMarkets: fromJsonList(ex.targetMarkets),
     products: c.products.map((p) => ({ nameEn: p.nameEn, nameAr: p.nameAr ?? p.nameEn, category: p.category as Industry })),
+    website: c.website ?? undefined,
   };
 }
 
-export async function listDirectoryExporters(): Promise<Exporter[]> {
+export const listDirectoryExporters = cache(async (): Promise<Exporter[]> => {
   try {
     const rows = await db.company.findMany({
       where: { type: "EXPORTER", isDraft: false },
       include: { exporter: true, products: true },
       orderBy: { createdAt: "desc" },
+      take: 200, // bound the query; add cursor pagination when volume warrants
     });
     const registered = rows.filter((r) => r.exporter).map(mapCompany);
     // Registered companies first, then the sample exporters.
@@ -58,9 +62,9 @@ export async function listDirectoryExporters(): Promise<Exporter[]> {
   } catch {
     return EXPORTERS;
   }
-}
+});
 
-export async function getDirectoryExporter(id: string): Promise<Exporter | undefined> {
+export const getDirectoryExporter = cache(async (id: string): Promise<Exporter | undefined> => {
   const sample = EXPORTERS.find((e) => e.id === id);
   if (sample) return sample;
   try {
@@ -68,4 +72,4 @@ export async function getDirectoryExporter(id: string): Promise<Exporter | undef
     if (c && c.type === "EXPORTER" && c.exporter && !c.isDraft) return mapCompany(c);
   } catch {}
   return undefined;
-}
+});

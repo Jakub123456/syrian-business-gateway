@@ -23,15 +23,15 @@ async function importerCompany(uid: string) {
 
 export async function createDemandRequest(raw: unknown): Promise<DemandResult> {
   const session = await getSession();
-  if (!session) return { ok: false, error: "Not signed in" };
-  if (session.role !== "IMPORTER") return { ok: false, error: "Only importers can post requests" };
+  if (!session) return { ok: false, error: "notSignedIn" };
+  if (session.role !== "IMPORTER") return { ok: false, error: "importersOnly" };
 
   const parsed = createSchema.safeParse(raw);
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  if (!parsed.success) return { ok: false, error: "invalidInput" };
   const d = parsed.data;
 
   const company = await importerCompany(session.uid);
-  if (!company) return { ok: false, error: "Complete your importer profile first" };
+  if (!company) return { ok: false, error: "profileIncomplete" };
 
   const created = await db.demandRequest.create({
     data: {
@@ -56,16 +56,16 @@ async function ownRequest(uid: string, id: string) {
 
 export async function setDemandStatus(id: string, status: "OPEN" | "CLOSED"): Promise<DemandResult> {
   const session = await getSession();
-  if (!session) return { ok: false, error: "Not signed in" };
-  if (!(await ownRequest(session.uid, id))) return { ok: false, error: "Request not found" };
+  if (!session) return { ok: false, error: "notSignedIn" };
+  if (!(await ownRequest(session.uid, id))) return { ok: false, error: "requestNotFound" };
   await db.demandRequest.update({ where: { id }, data: { status } });
   return { ok: true };
 }
 
 export async function deleteDemandRequest(id: string): Promise<DemandResult> {
   const session = await getSession();
-  if (!session) return { ok: false, error: "Not signed in" };
-  if (!(await ownRequest(session.uid, id))) return { ok: false, error: "Request not found" };
+  if (!session) return { ok: false, error: "notSignedIn" };
+  if (!(await ownRequest(session.uid, id))) return { ok: false, error: "requestNotFound" };
   await db.demandRequest.delete({ where: { id } });
   return { ok: true };
 }

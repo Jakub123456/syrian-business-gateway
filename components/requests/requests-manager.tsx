@@ -108,7 +108,7 @@ export function RequestsManager({
           <span className="mb-1.5 block text-sm font-medium text-brand-800">{f.fDescription}</span>
           <textarea required rows={4} value={form.description} onChange={(e) => set({ description: e.target.value })} placeholder={f.fDescriptionPlaceholder} className={inputClass} />
         </label>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p role="alert" className="text-sm text-red-600">{(dict.errors as Record<string, string>)[error] ?? error}</p>}
         <button type="submit" disabled={submitting} className="rounded-lg bg-gold-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-gold-600 disabled:opacity-60">
           {submitting ? f.posting : f.submit}
         </button>

@@ -93,7 +93,7 @@ export function ReadinessPanel({
         </button>
       </div>
 
-      {error && <p className="text-sm text-red-600 print:hidden">{error}</p>}
+      {error && <p role="alert" className="text-sm text-red-600 print:hidden">{(dict.errors as Record<string, string>)[error] ?? error}</p>}
 
       {/* VAS: multi-market comparison */}
       {comparison && comparison.length > 0 && (

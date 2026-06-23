@@ -183,7 +183,11 @@ export function ImporterWizard({ locale, dict }: { locale: Locale; dict: Diction
         </div>
       )}
 
-      {error && <p className="mt-4 text-sm text-red-600">{dict.common.required}: {error}</p>}
+      {error && (
+        <p role="alert" className="mt-4 text-sm text-red-600">
+          {(dict.errors as Record<string, string>)[error] ?? `${dict.common.required}: ${error}`}
+        </p>
+      )}
 
       <div className="mt-8 flex items-center justify-between">
         <button

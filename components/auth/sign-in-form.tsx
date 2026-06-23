@@ -40,7 +40,7 @@ export function SignInForm({ locale, dict }: { locale: Locale; dict: Dictionary 
         <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} autoComplete="current-password" />
       </label>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p role="alert" className="text-sm text-red-600">{(dict.errors as Record<string, string>)[error] ?? error}</p>}
 
       <button
         type="submit"

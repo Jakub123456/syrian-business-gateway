@@ -19,6 +19,7 @@ export type Exporter = {
   yearEstablished: number;
   targetMarkets: string[]; // iso2[]
   products: ExporterProduct[];
+  website?: string;
 };
 
 export const EXPORTERS: Exporter[] = [

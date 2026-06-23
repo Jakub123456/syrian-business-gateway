@@ -1,14 +1,27 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { getDictionary, type Dictionary } from "@/lib/i18n/dictionaries";
 import { db } from "@/lib/db";
+import { localeAlternates } from "@/lib/seo";
 import { INDUSTRIES, GOVERNORATES, label } from "@/lib/taxonomy";
 import { getExporter } from "@/lib/data/exporters";
 import { Icon } from "@/components/icon";
 import { AudienceSplit } from "@/components/home/audience-split";
 import { ProofStrip } from "@/components/home/proof-strip";
 import { HowItWorks } from "@/components/home/how-it-works";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isLocale(locale)) return {};
+  const dict = await getDictionary(locale as Locale);
+  return {
+    title: { absolute: dict.home.h1 },
+    description: dict.home.subtitle,
+    alternates: localeAlternates(locale as Locale, ""),
+  };
+}
 
 export default async function HomePage({
   params,

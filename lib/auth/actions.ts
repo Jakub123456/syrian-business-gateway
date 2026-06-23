@@ -7,13 +7,22 @@ import { toJsonList } from "@/lib/serialize";
 import { hashPassword, verifyPassword } from "./password";
 import { setSessionCookie, clearSessionCookie, type Role } from "./session";
 import { rateLimit } from "@/lib/ratelimit";
+import { normalizeWebsite, isValidHttpUrl } from "@/lib/url";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
 const credentials = z.object({
   email: z.email(),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(8, "invalidPassword"),
 });
+
+// Normalises (adds https://) then rejects anything that isn't an http(s) URL.
+const websiteField = z
+  .string()
+  .optional()
+  .default("")
+  .transform((v) => normalizeWebsite(v ?? ""))
+  .refine((v) => v === "" || isValidHttpUrl(v), { message: "invalidWebsite" });
 
 const productSchema = z.object({ nameEn: z.string().min(1), category: z.string().min(1) });
 
@@ -22,7 +31,7 @@ const exporterSchema = credentials.extend({
   nameEn: z.string().min(1),
   nameAr: z.string().optional().default(""),
   phone: z.string().optional().default(""),
-  website: z.string().optional().default(""),
+  website: websiteField,
   description: z.string().optional().default(""),
   governorate: z.string().min(1),
   sectors: z.array(z.string()).min(1),
@@ -41,7 +50,7 @@ const importerSchema = credentials.extend({
   locale: z.string().default("en"),
   name: z.string().min(1),
   phone: z.string().optional().default(""),
-  website: z.string().optional().default(""),
+  website: websiteField,
   industries: z.array(z.string()).min(1),
   country: z.string().min(1),
   description: z.string().optional().default(""),
@@ -49,17 +58,21 @@ const importerSchema = credentials.extend({
   orderVolume: z.string().optional().default(""),
 });
 
+// Errors are returned as codes; the client maps them to localised messages (dict.errors).
+const KNOWN_FIELD_CODES = new Set(["invalidPassword", "invalidWebsite"]);
+const fieldCode = (m?: string) => (m && KNOWN_FIELD_CODES.has(m) ? m : "invalidInput");
+
 async function emailTaken(email: string): Promise<boolean> {
   return (await db.user.findUnique({ where: { email: email.toLowerCase() } })) !== null;
 }
 
 export async function registerExporter(raw: unknown): Promise<ActionResult> {
   if (!(await rateLimit("register", { limit: 5, windowSec: 3600 })).success)
-    return { ok: false, error: "Too many sign-ups from this network. Please try again later." };
+    return { ok: false, error: "rateLimited" };
   const parsed = exporterSchema.safeParse(raw);
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  if (!parsed.success) return { ok: false, error: fieldCode(parsed.error.issues[0]?.message) };
   const d = parsed.data;
-  if (await emailTaken(d.email)) return { ok: false, error: "An account with this email already exists" };
+  if (await emailTaken(d.email)) return { ok: false, error: "emailExists" };
 
   const user = await db.user.create({
     data: {
@@ -105,11 +118,11 @@ export async function registerExporter(raw: unknown): Promise<ActionResult> {
 
 export async function registerImporter(raw: unknown): Promise<ActionResult> {
   if (!(await rateLimit("register", { limit: 5, windowSec: 3600 })).success)
-    return { ok: false, error: "Too many sign-ups from this network. Please try again later." };
+    return { ok: false, error: "rateLimited" };
   const parsed = importerSchema.safeParse(raw);
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  if (!parsed.success) return { ok: false, error: fieldCode(parsed.error.issues[0]?.message) };
   const d = parsed.data;
-  if (await emailTaken(d.email)) return { ok: false, error: "An account with this email already exists" };
+  if (await emailTaken(d.email)) return { ok: false, error: "emailExists" };
 
   const user = await db.user.create({
     data: {
@@ -144,14 +157,14 @@ export async function registerImporter(raw: unknown): Promise<ActionResult> {
 
 export async function signInWithPassword(raw: unknown): Promise<ActionResult> {
   if (!(await rateLimit("signin", { limit: 5, windowSec: 900 })).success)
-    return { ok: false, error: "Too many attempts. Please wait a few minutes and try again." };
+    return { ok: false, error: "rateLimited" };
   const parsed = credentials.safeParse(raw);
-  if (!parsed.success) return { ok: false, error: "Enter a valid email and password" };
+  if (!parsed.success) return { ok: false, error: "invalidInput" };
   const { email, password } = parsed.data;
 
   const user = await db.user.findUnique({ where: { email: email.toLowerCase() } });
   if (!user || !(await verifyPassword(password, user.passwordHash))) {
-    return { ok: false, error: "Invalid email or password" };
+    return { ok: false, error: "invalidCredentials" };
   }
   await setSessionCookie({ uid: user.id, email: user.email, role: user.role as Role });
   return { ok: true };
