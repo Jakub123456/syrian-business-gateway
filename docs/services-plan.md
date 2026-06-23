@@ -29,8 +29,9 @@ trade payment; keep the two separate.)*
 | `Company.verification` enum | schema (`UNVERIFIED`→`VERIFIED`) | Verification fast-track, trust badge |
 | Sector taxonomy (9) + governorates (14) | `lib/taxonomy.ts` | Matching, sector hubs, alerts |
 
-**Prerequisite gaps:** no email/notification provider; no `featured` field; no admin console;
-matching/offers not built; registered exporters not yet shown in the public directory.
+**Prerequisite gaps:** no email/notification provider; no `featured` field; no admin console
+/ verification workflow; no billing; matching/offers not built. *(Registered exporters now
+**do** appear in the directory.)*
 
 ---
 
@@ -96,43 +97,59 @@ distinct from trade payments/escrow which stay out of scope.
 
 ---
 
-## Build-first roadmap (highest ROI, least infra) — with touchpoints
+## Status & improvement plan (re-prioritised)
 
-Ordered. Each maps to existing code; the only net-new infra is an email provider.
+### Already shipped (codebase audit)
+- ✅ Readiness scoring + **multi-market comparison** + **PDF / print report** (`lib/readiness/*`, `/dashboard/readiness`)
+- ✅ **Supplier shortlist on an RFQ** (`lib/match/shortlist.ts`, importer dashboard)
+- ✅ Import Requests / RFQ board — post, browse, manage (`lib/demand/*`, `/requests`)
+- ✅ **Directory now reads the DB** — registered exporters appear (`lib/directory.ts`); this
+  was the blocker that made importer VAS meaningful.
 
-1. **Readiness PDF report** *(S–M, no new infra)*
-   - Render the existing `ReadinessResult` (dims + `topGaps` + narrative) to PDF.
-   - Touch: new `app/[locale]/dashboard/readiness/[iso2]/report` route or a server action
-     using `@react-pdf/renderer` (or print-CSS + browser print). Reuses `lib/readiness/*`.
+So **3 of the 6 original build-first items are done** and the directory dependency is resolved.
 
-2. **Featured listing** *(S for the sort; monetize later)*
-   - Add `featured Boolean` + `featuredUntil DateTime?` to `Company`; sort the directory by
-     featured first. Touch: schema + migration, `directory-browser` sort, later a Pro flag.
+### Two unlocks gate most of the rest — decide these first
+- **Email provider** (Resend) → unlocks *every* alert/notify service: market demand alerts,
+  RFQ broadcast, importer saved-search alerts. Single highest-leverage piece of infra.
+- **Admin + billing** → a **verification workflow** makes the "Verified" badge real (and
+  sellable as a concierge fast-track), and **Stripe Billing** gates the Pro tier.
 
-3. **Country Market Guides** *(M)*
-   - Build read-only market pages from `lib/data/countries.ts` (the data the deleted Explorer
-     used): per-country imports, trade blocs, per-category requirements. Touch: new
-     `/[locale]/markets` + `/markets/[iso2]` routes. Gate depth behind Pro later.
+### Wave 1 — platform quick wins (no new infra)
+1. **Certification roadmap** *(S)* — the rubric already finds cert gaps; order them into a
+   path (HACCP → EU Organic → export licence) and render on the readiness result.
+   Touch: `lib/readiness/rubric.ts` (emit ordered cert steps) + readiness panel.
+2. **Profile optimisation checklist** *(S)* — the readiness "profile completeness" dimension
+   already has the signals (website, logo, Arabic name, products, certs); surface them as a
+   dashboard checklist with fix links. Touch: dashboard.
+3. **Featured listing (sort)** *(S)* — add `featured` / `featuredUntil` to `Company`, sort
+   featured-first in `lib/directory.ts`. Monetise later via billing.
+4. **Readiness-filtered search** *(S–M, importer)* — the directory now has DB exporters +
+   verification + export stage; add an "export-ready & verified only" filter (and per-sector).
+   Touch: `directory-browser` filters.
 
-4. **Supplier shortlist on an RFQ** *(M)*
-   - Rules-based ranking of exporters for a `DemandRequest`: sector ∩ request category,
-     verified first, then export-stage/cert proxy (we can't run an exporter's private
-     readiness for a buyer — use a public cert/stage proxy). Touch: `lib/match/` ranker +
-     a panel on the request/importer dashboard.
+### Wave 2 — email-gated (after choosing a provider)
+5. **Market demand alerts** *(M)* — on `createDemandRequest`, email opt-in exporters whose
+   sectors match the category. Touch: `lib/email/` (Resend) + opt-in field on
+   `ExporterProfile` + hook in `lib/demand/actions.ts`.
+6. **RFQ broadcast + importer saved-search alerts** *(M)* — reuse the same matcher + email.
 
-5. **Demand alerts + RFQ broadcast** *(M — needs email)*
-   - On `createDemandRequest`, find exporters whose sectors include the category and email
-     them (opt-in). Touch: **add an email provider** (Resend) + `ANTHROPIC`-style env key,
-     `lib/email/`, an opt-in field on `ExporterProfile`, hook in `lib/demand/actions.ts`.
-   - This unlocks importer saved-search alerts too.
+### Wave 3 — trust + monetisation
+7. **Verification workflow + minimal admin** *(M)* — "request verification"
+   (`UNVERIFIED → PENDING`) + an ADMIN-only queue to set `VERIFIED` / `REJECTED`. Makes the
+   badge honest; powers the concierge "fast-track". Touch: action + `app/[locale]/admin`.
+8. **Stripe Billing → Pro tier** *(M–L)* — gate featured slot, unlimited readiness, alerts.
+   SaaS subscription only — distinct from trade payments (which stay out of scope).
 
-6. **Verification fast-track** *(M)*
-   - Implement the `verification` lifecycle: a "request verification" action
-     (`UNVERIFIED→PENDING`) + a minimal admin view to set `VERIFIED`/`REJECTED`. Surfaces the
-     existing "Verified" badge honestly. Touch: action + `app/[locale]/admin` (ADMIN role).
+### Wave 4 — content / SEO (needs a product decision)
+9. **Country Market Guides** *(M)* — read-only `/markets` + `/markets/[iso2]` from
+   `lib/data/countries.ts` (label/packaging rules, importer compliance checklist).
+   **Decision:** this revives the kind of country pages that were deliberately removed —
+   confirm before building. High SEO value; premium-gate depth later.
+10. **Sector SEO hubs** *(M)* — olive-oil / rosewater / textiles landing pages.
 
-**Prerequisite for #5 (and any alerts):** choose + wire an email provider — it's the single
-unlock for most "alert/notify" VAS.
+> **Concierge & partner-referral services are ops/sales, not engineering** — they need a
+> referral-directory field + a simple intake form, then sales follow-through. Sequence them
+> with business development, not the build roadmap.
 
 ---
 
@@ -145,20 +162,23 @@ these as **partner referrals**, never core product.
 
 ## Positioning honesty (say only what's live)
 
-- Directory is "browse sample suppliers" until **registered companies are wired into the
-  public directory** (today it shows seed data only).
-- No "you'll be matched / receive offers" language until **matching + offers** ship.
-- "Country guides / market explorer" — frame as **coming** (data exists; public UI was
-  removed and needs rebuilding).
-- Readiness = "gap analysis & priority actions," not a full "development plan" product.
+- Directory now shows **registered companies** (DB) merged with sample data — drop the
+  samples once real signups are enough to fill it.
+- "Verified" badge is **cosmetic** until the verification workflow ships — don't market
+  vetting yet; the directory copy already softened "verified" → "Syrian exporters".
+- No "you'll be matched / receive offers" language until **offers** ship (shortlist is
+  "evaluate and reach out", not automated matching).
+- Readiness = "gap analysis & priority actions" + comparison + PDF — not a full
+  "development plan" product.
+- "Country guides" — frame as **coming** (data exists; no public UI).
 
 ---
 
 ## Open decisions (before building)
 
-1. **Monetization now or later?** Build VAS as free beta features first, or wire Stripe
-   Billing alongside (gates Pro tier)?
-2. **Email provider** — Resend (simplest) vs Postmark vs SES?
-3. **Wire registered exporters into the public directory** first? Several importer VAS
-   (shortlist, search, alerts) are only meaningful once real signups appear there.
-4. **Admin console scope** — minimal verification queue now, or a fuller content/admin tool?
+1. **Monetisation now or later?** Ship Wave 1–2 as free beta, or wire Stripe Billing
+   alongside to gate the Pro tier?
+2. **Email provider** — Resend (simplest) vs Postmark vs SES? (Gates all of Wave 2.)
+3. **Verification depth** — minimal admin queue now, or a fuller document-review flow?
+4. **Revive market pages?** Country Market Guides means re-introducing country pages that
+   were deliberately removed — yes (as premium guides) or keep deferred?
